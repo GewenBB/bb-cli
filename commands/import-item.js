@@ -17,43 +17,66 @@ var exclude = ['.git', '.gitignore', 'bower_components', 'node_modules'];
 
 var bbrest, jxon, cfg, name;
 
-module.exports = Command.extend({
-    help: function() {
-        var title = chalk.bold;
-        var d = chalk.gray;
-        var r = '\n  ' + title('Usage') + ': bb ' + this.name + ' [OPTIONS]';
-        r += '\n\t Zips and imports item.';
-        r += '\n\n  ' + title('Options') + ': -short, --name <type> ' + d('default') + ' description\n';
-        r += '      -t,  --target <string>\t\t' + '\t\tDir to import.\n';
-        r += '      -w,  --watch <boolean>\t\t' + '\t\tWatch for file changes in the current dir and autosubmit.\n';
-        r += '      -l,  --collection <boolean>\t' + '\t\tWatch collection directory tree for changes.\n';
-        r += '      -i,  --init-import <boolean>\t' + '\t\tImport whole collection on init.\n';
-        r += '      -a,  --auto <boolean>\t\t' + '\t\tAuto create model.xml if doesn\'t exist.\n';
-        r += '      -n,  --name <boolean>\t\t' + '\t\tName of the feature to auto create before reading bower.json\n';
-        r += '      -v,  --version <boolean>\t\t' + '\t\tVersion of the feature to auto create before reading bower.json\n';
-        r += '           --verbose <boolean>\t\t' + '\t\tEnables detailed output.\n\n';
+var options = {
+    target: {type: 'string', alias: 't', default: './'},
+    watch: {type: 'boolean', alias: 'w'},
+    collection: {type: 'boolean', alias: 'l'},
+    'init-import': {type: 'boolean', alias: 'i'},
+    auto: {type: 'boolean', alias: 'a'},
+    name: {type: 'string', alias: 'n'},
+    version: {type: 'string', alias: 'v'},
+    verbose: {type: 'boolean'}
+};
 
-        r += '      -H,  --host <string>\t\t' + d('localhost') + '\tThe host name of the server running portal foundation.\n';
-        r += '      -P,  --port <number>\t\t' + d('7777') + '\t\tThe port of the server running portal foundation.\n';
-        r += '      -c,  --context <string>\t\t' + d('portalserver') + '\tThe application context of the portal foundation.\n';
-        r += '      -u,  --username <string>\t\t' + d('admin') + '\t\tUsername.\n';
-        r += '      -w,  --password <string>\t\t' + d('admin') + '\t\tPassword.\n';
-        r += '      -p,  --portal <string>\t\t\t\tName of the portal on the server to target.\n';
-        return r;
-    },
+var command = {
+    help: helpCommand,
+    run: runCommand,
+    options: options
+};
 
-    options: {
-        target: {type: 'string', alias: 't', default: './'},
-        watch: {type: 'boolean', alias: 'w'},
-        collection: {type: 'boolean', alias: 'l'},
-        'init-import': {type: 'boolean', alias: 'i'},
-        auto: {type: 'boolean', alias: 'a'},
-        name: {type: 'string', alias: 'n'},
-        version: {type: 'string', alias: 'v'},
-        verbose: {type: 'boolean'}
-    },
 
-    run: function () {
+module.exports = getProgramCommands( commands );
+
+
+
+function getProgramCommands(command){
+    return extendCommand( command );
+}
+
+function extendCommand(extendWith){
+    return Command.extend( extendWith );
+}
+
+
+
+function helpCommand() {
+    var bold = chalk.bold;
+    var gray = chalk.gray;
+    var r = getHelpPrependMessage.call(this);
+    r += '\n\t Zips and imports item.';
+    r += '\n\n  ' + bold('Options') + ': -short, --name <type> ' + gray('default') + ' description\n';
+    r += '      -t,  --target <string>\t\t' + '\t\tDir to import.\n';
+    r += '      -w,  --watch <boolean>\t\t' + '\t\tWatch for file changes in the current dir and autosubmit.\n';
+    r += '      -l,  --collection <boolean>\t' + '\t\tWatch collection directory tree for changes.\n';
+    r += '      -i,  --init-import <boolean>\t' + '\t\tImport whole collection on init.\n';
+    r += '      -a,  --auto <boolean>\t\t' + '\t\tAuto create model.xml if doesn\'t exist.\n';
+    r += '      -n,  --name <boolean>\t\t' + '\t\tName of the feature to auto create before reading bower.json\n';
+    r += '      -v,  --version <boolean>\t\t' + '\t\tVersion of the feature to auto create before reading bower.json\n';
+    r += '           --verbose <boolean>\t\t' + '\t\tEnables detailed output.\n\n';
+
+    r += '      -H,  --host <string>\t\t' + gray('localhost') + '\tThe host name of the server running portal foundation.\n';
+    r += '      -P,  --port <number>\t\t' + gray('7777') + '\t\tThe port of the server running portal foundation.\n';
+    r += '      -c,  --context <string>\t\t' + gray('portalserver') + '\tThe application context of the portal foundation.\n';
+    r += '      -u,  --username <string>\t\t' + gray('admin') + '\t\tUsername.\n';
+    r += '      -w,  --password <string>\t\t' + gray('admin') + '\t\tPassword.\n';
+    r += '      -p,  --portal <string>\t\t\t\tName of the portal on the server to target.\n';
+    return r;
+}
+
+function getHelpPrependMessage(){
+    return '\n  ' + chalk.bold('Usages') + ': bb ' + this.name + ' [OPTIONS]';
+}
+function runCommand() {
 
         return config.getCommon(this.options)
         .then(function(r) {
@@ -89,8 +112,8 @@ module.exports = Command.extend({
             }
         });
 
-    }
-});
+
+}
 
 function run(target) {
     var model = modelXml(jxon);
