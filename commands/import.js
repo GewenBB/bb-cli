@@ -189,7 +189,7 @@ function importDashboard() {
     var options = {
         uri: bbrc.scheme + '://' + bbrc.host + ':' + bbrc.port + '/' + bbrc.context + '/import',
         method: 'POST',
-        auth: util.getAuth( bbrc ),
+        auth: util.getAuthentication(bbrc),
         headers: {
             Pragma: 'no-cache',
             'Accept-Encoding': 'gzip, deflate',
