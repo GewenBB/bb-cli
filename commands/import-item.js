@@ -1,4 +1,5 @@
 var chalk = require('chalk');
+var semver = require('semver');
 var util = require('../lib/util');
 var config = require('../lib/config');
 var modelXml = require('../lib/modelXml');
@@ -110,7 +111,8 @@ function runCommand() {
 
                 return run(cfg.target);
             }
-        });
+        })
+        .catch(error);
 
 
 }
@@ -148,7 +150,7 @@ function prepareModel(target, model) {
     return model.read(path.resolve(target, 'model.xml'))
     .then(function() {
         if (!model.getProperty('version')) {
-            if (cfg.version) {
+            if (cfg.version && semver.valid(cfg.version)) {
                 model.addProperty('version', cfg.version);
             } else {
                 return getBowerJson(target)
